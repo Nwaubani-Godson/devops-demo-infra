@@ -1,0 +1,21 @@
+# Terraform local files
+.terraform/
+*.tfstate
+*.tfstate.*
+crash.log
+crash.*.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+.terraformrc
+terraform.rc
+
+# Sensitive tfvars
+*.tfvars
+!*.auto.tfvars
+!terraform.tfvars
+
+# Ansible temporary files
+*.retry
+.ansible/

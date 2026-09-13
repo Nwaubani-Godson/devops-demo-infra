@@ -1,0 +1,23 @@
+---
+- name: Create Prometheus config directory
+  file:
+    path: /etc/prometheus
+    state: directory
+    mode: '0755'
+
+- name: Template Prometheus configuration
+  template:
+    src: prometheus.yml.j2
+    dest: /etc/prometheus/prometheus.yml
+    mode: '0644'
+
+- name: Run Prometheus Docker container
+  docker_container:
+    name: prometheus
+    image: prom/prometheus:v2.51.0
+    state: started
+    restart_policy: always
+    ports:
+      - "9090:9090"
+    volumes:
+      - /etc/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml

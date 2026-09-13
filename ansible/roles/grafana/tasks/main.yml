@@ -1,0 +1,12 @@
+---
+- name: Run Grafana Docker container
+  docker_container:
+    name: grafana
+    image: grafana/grafana:10.4.0
+    state: started
+    restart_policy: always
+    ports:
+      - "3000:3000"
+    env:
+      GF_SECURITY_ADMIN_PASSWORD: "admin"
+      GF_USERS_ALLOW_SIGN_UP: "false"

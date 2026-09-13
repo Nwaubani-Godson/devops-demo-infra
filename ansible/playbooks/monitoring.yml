@@ -1,0 +1,8 @@
+---
+- name: Deploy Prometheus and Grafana Observability Stack
+  hosts: monitoring
+  become: yes
+  roles:
+    - docker
+    - prometheus
+    - grafana
