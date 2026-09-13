@@ -18,3 +18,8 @@ variable "instance_type" {
   default     = "t3.micro"
   description = "EC2 Instance Type for Monitoring Host"
 }
+
+variable "app_alb_dns" {
+  type        = string
+  description = "ALB DNS name for the app - used by Prometheus to scrape /metrics"
+}

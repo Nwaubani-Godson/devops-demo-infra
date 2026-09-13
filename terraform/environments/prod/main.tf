@@ -58,4 +58,5 @@ module "monitoring" {
   environment      = var.environment
   vpc_id           = module.vpc.vpc_id
   public_subnet_id = module.vpc.public_subnet_ids[0]
+  app_alb_dns      = module.alb.alb_dns_name
 }
