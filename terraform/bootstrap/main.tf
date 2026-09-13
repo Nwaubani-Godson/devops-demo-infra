@@ -80,6 +80,7 @@ resource "aws_iam_openid_connect_provider" "github" {
 
 # ==============================================================================
 # LEAST PRIVILEGE ROLE 1: App Repository CI Role (devops-demo-app)
+# Pinned strictly to devops-demo-app repository sub claim
 # ==============================================================================
 resource "aws_iam_role" "app_github_actions" {
   name = "devops-demo-app-ecr-role"
@@ -94,9 +95,6 @@ resource "aws_iam_role" "app_github_actions" {
         }
         Action = "sts:AssumeRoleWithWebIdentity"
         Condition = {
-          StringEquals = {
-            "token.actions.githubusercontent.com:aud" = "sts.amazonaws.com"
-          }
           StringLike = {
             "token.actions.githubusercontent.com:sub" = [
               "repo:Nwaubani-Godson/devops-demo-app:*",
@@ -149,6 +147,7 @@ resource "aws_iam_role_policy_attachment" "app_ecr_attach" {
 
 # ==============================================================================
 # LEAST PRIVILEGE ROLE 2: Infrastructure Repository Role (devops-demo-infra)
+# Pinned strictly to devops-demo-infra repository sub claim
 # ==============================================================================
 resource "aws_iam_role" "infra_github_actions" {
   name = "devops-demo-infra-tf-role"
@@ -163,9 +162,6 @@ resource "aws_iam_role" "infra_github_actions" {
         }
         Action = "sts:AssumeRoleWithWebIdentity"
         Condition = {
-          StringEquals = {
-            "token.actions.githubusercontent.com:aud" = "sts.amazonaws.com"
-          }
           StringLike = {
             "token.actions.githubusercontent.com:sub" = [
               "repo:Nwaubani-Godson/devops-demo-infra:*",
