@@ -32,6 +32,10 @@ permissions:
   contents: read
   pull-requests: write
 
+env:
+  INFRA_ROLE_ARN: "arn:aws:iam::654654484434:role/devops-demo-infra-tf-role"
+  AWS_REGION: "us-east-1"
+
 jobs:
   terraform-dev-plan:
     name: Dev — Terraform Plan
@@ -51,9 +55,8 @@ jobs:
       - name: Configure AWS Credentials (OIDC)
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: ${{ secrets.AWS_OIDC_ROLE_ARN }}
-          aws-region: ${{ secrets.AWS_REGION || 'us-east-1' }}
-          audience: sts.amazonaws.com
+          role-to-assume: ${{ secrets.AWS_OIDC_ROLE_ARN || env.INFRA_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
 
       - name: Terraform Init
         run: terraform init
@@ -94,9 +97,8 @@ jobs:
       - name: Configure AWS Credentials (OIDC)
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: ${{ secrets.AWS_OIDC_ROLE_ARN }}
-          aws-region: ${{ secrets.AWS_REGION || 'us-east-1' }}
-          audience: sts.amazonaws.com
+          role-to-assume: ${{ secrets.AWS_OIDC_ROLE_ARN || env.INFRA_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
 
       - name: Terraform Init
         run: terraform init
@@ -129,9 +131,8 @@ jobs:
       - name: Configure AWS Credentials (OIDC)
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: ${{ secrets.AWS_OIDC_ROLE_ARN }}
-          aws-region: ${{ secrets.AWS_REGION || 'us-east-1' }}
-          audience: sts.amazonaws.com
+          role-to-assume: ${{ secrets.AWS_OIDC_ROLE_ARN || env.INFRA_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
 
       - name: Terraform Init
         run: terraform init
@@ -167,9 +168,8 @@ jobs:
       - name: Configure AWS Credentials (OIDC)
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: ${{ secrets.AWS_OIDC_ROLE_ARN }}
-          aws-region: ${{ secrets.AWS_REGION || 'us-east-1' }}
-          audience: sts.amazonaws.com
+          role-to-assume: ${{ secrets.AWS_OIDC_ROLE_ARN || env.INFRA_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
 
       - name: Terraform Init
         run: terraform init
