@@ -64,7 +64,7 @@ resource "aws_dynamodb_table" "tf_locks" {
   }
 }
 
-# 3. IAM OpenID Connect Provider for GitHub Actions (Creates OIDC Provider in AWS)
+# 3. IAM OpenID Connect Provider for GitHub Actions
 resource "aws_iam_openid_connect_provider" "github" {
   url             = "https://token.actions.githubusercontent.com"
   client_id_list  = ["sts.amazonaws.com"]
@@ -73,7 +73,7 @@ resource "aws_iam_openid_connect_provider" "github" {
 
 # ==============================================================================
 # LEAST PRIVILEGE ROLE 1: App Repository CI Role (devops-demo-app)
-# Scope: ECR Auth Token & Image Push strictly for devops-demo-app repository
+# Handles case sensitivity variations for repository name matching
 # ==============================================================================
 resource "aws_iam_role" "app_github_actions" {
   name = "devops-demo-app-ecr-role"
@@ -88,11 +88,15 @@ resource "aws_iam_role" "app_github_actions" {
         }
         Action = "sts:AssumeRoleWithWebIdentity"
         Condition = {
-          "ForAnyValue:StringEquals" = {
+          StringEquals = {
             "token.actions.githubusercontent.com:aud" = "sts.amazonaws.com"
           }
           StringLike = {
-            "token.actions.githubusercontent.com:sub" = "repo:Nwaubani-Godson/devops-demo-app:*"
+            "token.actions.githubusercontent.com:sub" = [
+              "repo:Nwaubani-Godson/devops-demo-app:*",
+              "repo:nwaubani-godson/devops-demo-app:*",
+              "repo:*/devops-demo-app:*"
+            ]
           }
         }
       }
@@ -140,7 +144,7 @@ resource "aws_iam_role_policy_attachment" "app_ecr_attach" {
 
 # ==============================================================================
 # LEAST PRIVILEGE ROLE 2: Infrastructure Repository Role (devops-demo-infra)
-# Scope: Scoped to S3 backend, DynamoDB locks, VPC/EC2, ALB, ECS, ECR, CloudWatch
+# Handles case sensitivity variations for repository name matching
 # ==============================================================================
 resource "aws_iam_role" "infra_github_actions" {
   name = "devops-demo-infra-tf-role"
@@ -155,11 +159,15 @@ resource "aws_iam_role" "infra_github_actions" {
         }
         Action = "sts:AssumeRoleWithWebIdentity"
         Condition = {
-          "ForAnyValue:StringEquals" = {
+          StringEquals = {
             "token.actions.githubusercontent.com:aud" = "sts.amazonaws.com"
           }
           StringLike = {
-            "token.actions.githubusercontent.com:sub" = "repo:Nwaubani-Godson/devops-demo-infra:*"
+            "token.actions.githubusercontent.com:sub" = [
+              "repo:Nwaubani-Godson/devops-demo-infra:*",
+              "repo:nwaubani-godson/devops-demo-infra:*",
+              "repo:*/devops-demo-infra:*"
+            ]
           }
         }
       }
