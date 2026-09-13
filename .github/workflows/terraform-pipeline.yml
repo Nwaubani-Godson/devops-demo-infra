@@ -58,7 +58,7 @@ jobs:
       - name: Configure AWS Credentials (OIDC)
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: ${{ secrets.AWS_OIDC_ROLE_ARN }}
+          role-to-assume: arn:aws:iam::654654484434:role/GitHubActionsRole-DevOpsDemo
           aws-region: us-east-1
           role-session-name: GitHubActions-DevPlan
 
@@ -104,7 +104,7 @@ jobs:
       - name: Configure AWS Credentials (OIDC)
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: ${{ secrets.AWS_OIDC_ROLE_ARN }}
+          role-to-assume: arn:aws:iam::654654484434:role/GitHubActionsRole-DevOpsDemo
           aws-region: us-east-1
           role-session-name: GitHubActions-DevApply
 
@@ -142,7 +142,7 @@ jobs:
       - name: Configure AWS Credentials (OIDC)
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: ${{ secrets.AWS_OIDC_ROLE_ARN }}
+          role-to-assume: arn:aws:iam::654654484434:role/GitHubActionsRole-DevOpsDemo
           aws-region: us-east-1
           role-session-name: GitHubActions-Staging
 
@@ -183,7 +183,7 @@ jobs:
       - name: Configure AWS Credentials (OIDC)
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: ${{ secrets.AWS_OIDC_ROLE_ARN }}
+          role-to-assume: arn:aws:iam::654654484434:role/GitHubActionsRole-DevOpsDemo
           aws-region: us-east-1
           role-session-name: GitHubActions-Prod
 
