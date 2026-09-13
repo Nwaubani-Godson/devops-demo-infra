@@ -23,9 +23,9 @@ module "vpc" {
   environment = var.environment
 }
 
-module "ecr" {
-  source      = "../../modules/ecr"
-  environment = var.environment
+# ECR is a shared, account-wide registry — created once by dev, referenced here
+data "aws_ecr_repository" "app" {
+  name = "devops-demo-app"
 }
 
 module "alb" {
@@ -47,8 +47,15 @@ module "ecs" {
   public_subnet_ids     = module.vpc.public_subnet_ids
   target_group_arn      = module.alb.target_group_arn
   alb_security_group_id = module.alb.alb_security_group_id
-  image_url             = "${module.ecr.repository_url}:${var.image_tag}"
+  image_url             = "${data.aws_ecr_repository.app.repository_url}:${var.image_tag}"
   desired_count         = var.desired_count
   execution_role_arn    = module.iam.ecs_execution_role_arn
   task_role_arn         = module.iam.ecs_task_role_arn
+}
+
+module "monitoring" {
+  source           = "../../modules/monitoring"
+  environment      = var.environment
+  vpc_id           = module.vpc.vpc_id
+  public_subnet_id = module.vpc.public_subnet_ids[0]
 }
