@@ -4,7 +4,7 @@ This repository manages the AWS infrastructure, environment configurations (`dev
 
 ---
 
-## 🏗️ Architecture Overview
+## Architecture Overview
 
 ```
                                ┌───────────────┐
@@ -52,7 +52,7 @@ This repository manages the AWS infrastructure, environment configurations (`dev
 
 ---
 
-## 🚀 Key Modules & Structure
+##  Key Modules & Structure
 
 * `terraform/modules/vpc`: Public Subnet VPC layout without NAT Gateway hourly costs.
 * `terraform/modules/ecr`: ECR repository for `devops-demo-app` with 5-image lifecycle policy.
@@ -75,7 +75,7 @@ This repository manages the AWS infrastructure, environment configurations (`dev
 
 ---
 
-## 🔍 Live Demo Drift Remediation Test
+##  Live Demo Drift Remediation Test
 
 To demonstrate infrastructure drift remediation during a live presentation:
 1. Manually edit an ECS service in the AWS Console (e.g., change `desired_count` from `2` to `1`).
