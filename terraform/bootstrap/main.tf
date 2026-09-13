@@ -64,12 +64,12 @@ resource "aws_dynamodb_table" "tf_locks" {
   }
 }
 
-# 3. IAM OpenID Connect Provider for GitHub Actions
+# 3. OIDC Provider
 resource "aws_iam_openid_connect_provider" "github" {
   url = "https://token.actions.githubusercontent.com"
 
   client_id_list = [
-    "sts.amazonaws.com"
+    "sts.amazonaws.com",
   ]
 
   thumbprint_list = [
@@ -78,79 +78,9 @@ resource "aws_iam_openid_connect_provider" "github" {
   ]
 }
 
-# ==============================================================================
-# LEAST PRIVILEGE ROLE 1: App Repository CI Role (devops-demo-app)
-# Pinned strictly to devops-demo-app repository sub claim
-# ==============================================================================
-resource "aws_iam_role" "app_github_actions" {
-  name = "devops-demo-app-ecr-role"
-
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Principal = {
-          Federated = aws_iam_openid_connect_provider.github.arn
-        }
-        Action = "sts:AssumeRoleWithWebIdentity"
-        Condition = {
-          StringLike = {
-            "token.actions.githubusercontent.com:sub" = [
-              "repo:Nwaubani-Godson/devops-demo-app:*",
-              "repo:nwaubani-godson/devops-demo-app:*"
-            ]
-          }
-        }
-      }
-    ]
-  })
-}
-
-resource "aws_iam_policy" "app_ecr_policy" {
-  name        = "devops-demo-app-ecr-policy"
-  description = "Least-privilege policy allowing image push to devops-demo-app ECR repo"
-
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect   = "Allow"
-        Action   = ["ecr:GetAuthorizationToken"]
-        Resource = "*"
-      },
-      {
-        Effect = "Allow"
-        Action = [
-          "ecr:BatchCheckLayerAvailability",
-          "ecr:GetDownloadUrlForLayer",
-          "ecr:GetRepositoryPolicy",
-          "ecr:DescribeRepositories",
-          "ecr:ListImages",
-          "ecr:DescribeImages",
-          "ecr:BatchGetImage",
-          "ecr:InitiateLayerUpload",
-          "ecr:UploadLayerPart",
-          "ecr:CompleteLayerUpload",
-          "ecr:PutImage"
-        ]
-        Resource = "arn:aws:ecr:*:*:repository/devops-demo-app"
-      }
-    ]
-  })
-}
-
-resource "aws_iam_role_policy_attachment" "app_ecr_attach" {
-  role       = aws_iam_role.app_github_actions.name
-  policy_arn = aws_iam_policy.app_ecr_policy.arn
-}
-
-# ==============================================================================
-# LEAST PRIVILEGE ROLE 2: Infrastructure Repository Role (devops-demo-infra)
-# Pinned strictly to devops-demo-infra repository sub claim
-# ==============================================================================
-resource "aws_iam_role" "infra_github_actions" {
-  name = "devops-demo-infra-tf-role"
+# 4. IAM Role for GitHub Actions 
+resource "aws_iam_role" "github_actions" {
+  name = "GitHubActionsRole-DevOpsDemo"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -165,8 +95,13 @@ resource "aws_iam_role" "infra_github_actions" {
           StringLike = {
             "token.actions.githubusercontent.com:sub" = [
               "repo:Nwaubani-Godson/devops-demo-infra:*",
-              "repo:nwaubani-godson/devops-demo-infra:*"
+              "repo:Nwaubani-Godson/devops-demo-app:*",
+              "repo:nwaubani-godson/devops-demo-infra:*",
+              "repo:nwaubani-godson/devops-demo-app:*"
             ]
+          }
+          StringEquals = {
+            "token.actions.githubusercontent.com:aud" = "sts.amazonaws.com"
           }
         }
       }
@@ -174,65 +109,10 @@ resource "aws_iam_role" "infra_github_actions" {
   })
 }
 
-resource "aws_iam_policy" "infra_tf_policy" {
-  name        = "devops-demo-infra-tf-policy"
-  description = "Least-privilege policy for devops-demo-infra Terraform execution"
-
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Action = [
-          "s3:GetObject",
-          "s3:PutObject",
-          "s3:ListBucket"
-        ]
-        Resource = [
-          "arn:aws:s3:::devops-demo-tfstate-nwaubani-godson",
-          "arn:aws:s3:::devops-demo-tfstate-nwaubani-godson/*"
-        ]
-      },
-      {
-        Effect = "Allow"
-        Action = [
-          "dynamodb:GetItem",
-          "dynamodb:PutItem",
-          "dynamodb:DeleteItem"
-        ]
-        Resource = "arn:aws:dynamodb:*:*:table/devops-demo-tflocks"
-      },
-      {
-        Effect = "Allow"
-        Action = [
-          "ec2:*",
-          "ecs:*",
-          "ecr:*",
-          "elasticloadbalancing:*",
-          "logs:*",
-          "iam:GetRole",
-          "iam:CreateRole",
-          "iam:DeleteRole",
-          "iam:PassRole",
-          "iam:TagRole",
-          "iam:UntagRole",
-          "iam:PutRolePolicy",
-          "iam:DeleteRolePolicy",
-          "iam:GetRolePolicy",
-          "iam:AttachRolePolicy",
-          "iam:DetachRolePolicy",
-          "iam:ListAttachedRolePolicies",
-          "iam:ListRolePolicies"
-        ]
-        Resource = "*"
-      }
-    ]
-  })
-}
-
-resource "aws_iam_role_policy_attachment" "infra_tf_attach" {
-  role       = aws_iam_role.infra_github_actions.name
-  policy_arn = aws_iam_policy.infra_tf_policy.arn
+# 5. Policy Attachment for Infrastructure Orchestration 
+resource "aws_iam_role_policy_attachment" "admin" {
+  role       = aws_iam_role.github_actions.name
+  policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
 }
 
 # Outputs
@@ -246,12 +126,7 @@ output "dynamodb_table_name" {
   description = "DynamoDB Table Name for State Locking"
 }
 
-output "app_github_role_arn" {
-  value       = aws_iam_role.app_github_actions.arn
-  description = "Least privilege IAM Role ARN for devops-demo-app ECR push"
-}
-
-output "infra_github_role_arn" {
-  value       = aws_iam_role.infra_github_actions.arn
-  description = "Least privilege IAM Role ARN for devops-demo-infra Terraform deployment"
+output "github_role_arn" {
+  value       = aws_iam_role.github_actions.arn
+  description = "IAM Role ARN for GitHub Actions (arn:aws:iam::654654484434:role/GitHubActionsRole-DevOpsDemo)"
 }
