@@ -66,14 +66,20 @@ resource "aws_dynamodb_table" "tf_locks" {
 
 # 3. IAM OpenID Connect Provider for GitHub Actions
 resource "aws_iam_openid_connect_provider" "github" {
-  url             = "https://token.actions.githubusercontent.com"
-  client_id_list  = ["sts.amazonaws.com"]
-  thumbprint_list = ["6938fd4d98bab03faadb97b34396831e3780aea1", "1c58a21d286dd773791732c0c71801b972d56cf1"]
+  url = "https://token.actions.githubusercontent.com"
+
+  client_id_list = [
+    "sts.amazonaws.com"
+  ]
+
+  thumbprint_list = [
+    "6938fd4d98bab03faadb97b34396831e3780aea1",
+    "1c58a3a8518e8759bf075b76b750d4f2df264fcd"
+  ]
 }
 
 # ==============================================================================
 # LEAST PRIVILEGE ROLE 1: App Repository CI Role (devops-demo-app)
-# Handles case sensitivity variations for repository name matching
 # ==============================================================================
 resource "aws_iam_role" "app_github_actions" {
   name = "devops-demo-app-ecr-role"
@@ -94,8 +100,7 @@ resource "aws_iam_role" "app_github_actions" {
           StringLike = {
             "token.actions.githubusercontent.com:sub" = [
               "repo:Nwaubani-Godson/devops-demo-app:*",
-              "repo:nwaubani-godson/devops-demo-app:*",
-              "repo:*/devops-demo-app:*"
+              "repo:nwaubani-godson/devops-demo-app:*"
             ]
           }
         }
@@ -144,7 +149,6 @@ resource "aws_iam_role_policy_attachment" "app_ecr_attach" {
 
 # ==============================================================================
 # LEAST PRIVILEGE ROLE 2: Infrastructure Repository Role (devops-demo-infra)
-# Handles case sensitivity variations for repository name matching
 # ==============================================================================
 resource "aws_iam_role" "infra_github_actions" {
   name = "devops-demo-infra-tf-role"
@@ -165,8 +169,7 @@ resource "aws_iam_role" "infra_github_actions" {
           StringLike = {
             "token.actions.githubusercontent.com:sub" = [
               "repo:Nwaubani-Godson/devops-demo-infra:*",
-              "repo:nwaubani-godson/devops-demo-infra:*",
-              "repo:*/devops-demo-infra:*"
+              "repo:nwaubani-godson/devops-demo-infra:*"
             ]
           }
         }
