@@ -88,7 +88,7 @@ resource "aws_iam_role" "app_github_actions" {
         }
         Action = "sts:AssumeRoleWithWebIdentity"
         Condition = {
-          StringEquals = {
+          "ForAnyValue:StringEquals" = {
             "token.actions.githubusercontent.com:aud" = "sts.amazonaws.com"
           }
           StringLike = {
@@ -155,7 +155,7 @@ resource "aws_iam_role" "infra_github_actions" {
         }
         Action = "sts:AssumeRoleWithWebIdentity"
         Condition = {
-          StringEquals = {
+          "ForAnyValue:StringEquals" = {
             "token.actions.githubusercontent.com:aud" = "sts.amazonaws.com"
           }
           StringLike = {
