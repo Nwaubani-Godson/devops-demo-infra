@@ -97,7 +97,9 @@ resource "aws_iam_role" "github_actions" {
               "repo:Nwaubani-Godson/devops-demo-infra:*",
               "repo:Nwaubani-Godson/devops-demo-app:*",
               "repo:nwaubani-godson/devops-demo-infra:*",
-              "repo:nwaubani-godson/devops-demo-app:*"
+              "repo:nwaubani-godson/devops-demo-app:*",
+              "repo:Nwaubani-Godson*/devops-demo-infra*:*",
+              "repo:Nwaubani-Godson*/devops-demo-app*:*"
             ]
           }
           StringEquals = {
